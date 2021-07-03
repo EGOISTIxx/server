@@ -1,0 +1,72 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["filterJson"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          Int       @id @default(autoincrement())
+  email       String    @unique
+  password    String
+  name        String?
+  Profile     Profile?
+  comments    Comment[]
+  viewedFilms Viewed[]
+}
+
+model Viewed {
+  id       Int      @id @default(autoincrement())
+  viewedAt DateTime @default(now())
+  content  String?
+  User     User?    @relation(fields: [userId], references: [id])
+  userId   Int?
+}
+
+model Profile {
+  id            Int      @id @default(autoincrement())
+  createdAt     DateTime @default(now())
+  info          String?
+  subscribeType String?
+  avatar        String?
+  User          User?    @relation(fields: [userId], references: [id])
+  userId        Int?     @unique
+}
+
+model Comment {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now())
+  content   String?
+  Film      Film?     @relation(fields: [filmId], references: [id])
+  filmId    Int?
+  User      User[]     @relation(fields: [UserId], references: [id])
+  UserId    Int?
+  comments  Comment[] @relation("CommentToComment")
+  Comment   Comment?  @relation("CommentToComment", fields: [commentId], references: [id])
+  commentId Int?
+}
+
+model Film {
+  id              Int       @id @default(autoincrement())
+  img             String?
+  miniImg         String?
+  title           String?
+  description     String?
+  categories      String?
+  itemTitle       String?
+  ratingKinopoisk String?
+  ratingIMDb      String?
+  trailer         String?
+  more            String?
+  releaseYear     Int?
+  country         Json?
+  directors       Json?
+  geners          Json?
+  cast            Json?
+  kino            Json?
+  added           DateTime  @default(now())
+  comments        Comment[]
+}
